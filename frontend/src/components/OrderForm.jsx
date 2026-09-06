@@ -10,7 +10,7 @@ const PRODUCTS = [
 
 export default function OrderForm({ inventory, onSubmitOrder, isSubmitting }) {
   const [customerName, setCustomerName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('+91 9876543210');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [product, setProduct] = useState('Office Chair');
   const [quantity, setQuantity] = useState(1);
   const [validationError, setValidationError] = useState('');
@@ -36,15 +36,19 @@ export default function OrderForm({ inventory, onSubmitOrder, isSubmitting }) {
       return;
     }
 
+    const cleanDigits = phoneNumber.replace(/[^0-9]/g, '');
+    const formattedPhone = cleanDigits ? `+91${cleanDigits}` : '';
+
     onSubmitOrder({
       customerName: customerName.trim(),
-      phoneNumber: phoneNumber.trim(),
+      phoneNumber: formattedPhone,
       product,
       quantity: Number(quantity)
     });
 
-    // Reset customer name, keep product
+    // Reset customer name and phone, keep product
     setCustomerName('');
+    setPhoneNumber('');
     setQuantity(1);
   };
 
@@ -91,20 +95,31 @@ export default function OrderForm({ inventory, onSubmitOrder, isSubmitting }) {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label htmlFor="phoneNumber" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
-              WhatsApp Phone Number
+              WhatsApp Mobile Number
             </label>
             <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
               💬 Click-to-Chat
             </span>
           </div>
-          <input
-            id="phoneNumber"
-            type="text"
-            placeholder="+91 9876543210 (Country code + number)"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm transition-all bg-slate-50/50 focus:bg-white font-mono"
-          />
+          <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50/50 focus-within:bg-white focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 overflow-hidden transition-all shadow-2xs">
+            <div className="px-3 py-2.5 bg-slate-100/90 border-r border-slate-200 text-slate-700 text-sm font-semibold flex items-center space-x-1 select-none">
+              <span className="text-base leading-none">🇮🇳</span>
+              <span className="tracking-tight">+91</span>
+            </div>
+            <input
+              id="phoneNumber"
+              type="tel"
+              maxLength={10}
+              placeholder="Enter 10-digit mobile number"
+              value={phoneNumber}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                setPhoneNumber(val);
+              }}
+              className="w-full px-3.5 py-2.5 outline-none text-sm bg-transparent font-medium text-slate-900 placeholder:text-slate-400 font-mono tracking-wider"
+            />
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1 pl-1">Enter your 10-digit number without country code</p>
         </div>
 
         {/* Product Dropdown */}
