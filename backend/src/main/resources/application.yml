@@ -1,0 +1,33 @@
+server:
+  port: ${PORT:8085}
+
+spring:
+  application:
+    name: kafka-order-processing
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    properties:
+      sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      sasl.jaas.config: ${KAFKA_SASL_JAAS_CONFIG:}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: com.orderprocessing.model.Order
+
+app:
+  kafka:
+    topic: orders
+  # When true and external Kafka (port 9092) is not reachable, starts an in-process Kafka broker automatically
+  embedded-kafka:
+    enabled: true
+    port: 9092

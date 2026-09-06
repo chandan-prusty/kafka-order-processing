@@ -1,0 +1,16 @@
+#!/bin/sh
+# Lightweight Maven wrapper for Linux environments (Render / Railway / Docker)
+if command -v mvn >/dev/null 2>&1; then
+    exec mvn "$@"
+fi
+
+MAVEN_VERSION="3.9.9"
+MAVEN_DIR="$HOME/.m2/apache-maven-$MAVEN_VERSION"
+
+if [ ! -d "$MAVEN_DIR" ]; then
+    echo "Downloading Apache Maven $MAVEN_VERSION..."
+    mkdir -p "$MAVEN_DIR"
+    curl -fsSL "https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz" | tar -xz -C "$MAVEN_DIR" --strip-components=1
+fi
+
+exec "$MAVEN_DIR/bin/mvn" "$@"
